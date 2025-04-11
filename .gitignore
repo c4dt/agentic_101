@@ -1,0 +1,5 @@
+.env
+.vscode
+.venv
+.devbox
+emails_full.txt

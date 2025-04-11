@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/jetify-com/devbox/0.14.0/.schema/devbox.schema.json",
+  "packages": [
+    "python@latest",
+  ],
+  "shell": {
+    "init_hook": [
+      ". $VENV_DIR/bin/activate",
+      "test -x .venv/bin/markdownify || pip install -r requirements.txt"
+    ],
+    "scripts": {
+      "python": [
+        "python $1"
+      ],
+      "1-naive": [
+        "python 1-naive.py"
+      ],
+      "2-curl": [
+        "python 2-curl.py"
+      ],
+      "3-epfl-api": [
+        "python 3-epfl-api.py"
+      ],
+      "4-response-model": [
+        "python 4-response-model.py"
+      ],
+      "5-normal": [
+        "python 5-normal.py"
+      ]
+    }
+  }
+}
