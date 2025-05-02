@@ -4,6 +4,7 @@ from agno.tools.website import WebsiteTools
 from agno.agent import Agent, RunResponse
 from agno.models.lmstudio import LMStudio
 from agno.models.openai import OpenAIChat
+from agno.models.openai.like import OpenAILike
 from agno.models.anthropic import Claude
 import os
 
@@ -11,6 +12,10 @@ if os.environ.get("ANTHROPIC_API_KEY", "0") != "0":
   model=Claude(id="claude-3-5-sonnet-20240620")
 elif os.environ.get("OPENAI_API_KEY", "0") != "0":
   model=OpenAIChat(id="GPT-4o")
+elif os.environ.get("OPENAI_LIKE", "0") != "0":
+  model=OpenAILike(api_key=os.getenv("OPENAI_LIKE"),
+		id="c4dt",
+		base_url="http://localhost:3001/api/v1/openai")
 else:
   model=LMStudio()
 

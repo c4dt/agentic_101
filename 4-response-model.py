@@ -2,10 +2,22 @@ from textwrap import dedent
 from agno.agent import Agent, RunResponse
 from agno.models.lmstudio import LMStudio
 from agno.models.openai import OpenAIChat
+from agno.models.openai.like import OpenAILike
 from agno.models.anthropic import Claude
 from pydantic import BaseModel, Field
 import httpx
 import os
+
+if os.environ.get("ANTHROPIC_API_KEY", "0") != "0":
+  model=Claude(id="claude-3-5-sonnet-20240620")
+elif os.environ.get("OPENAI_API_KEY", "0") != "0":
+  model=OpenAIChat(id="GPT-4o")
+elif os.environ.get("OPENAI_LIKE", "0") != "0":
+  model=OpenAILike(api_key=os.getenv("OPENAI_LIKE"),
+		id="c4dt",
+		base_url="http://localhost:3001/api/v1/openai")
+else:
+  model=LMStudio()
 
 def get_person(email: str) -> str:
     """This function returns the description of this person in the EPFL database.
@@ -53,13 +65,6 @@ class RSEDescription(BaseModel):
     
 class RSEs(BaseModel):
     rses: list[RSEDescription]
-
-if os.environ.get("ANTHROPIC_API_KEY", "0") != "0":
-  model=Claude(id="claude-3-5-sonnet-20240620")
-elif os.environ.get("OPENAI_API_KEY", "0") != "0":
-  model=OpenAIChat(id="GPT-4o")
-else:
-  model=LMStudio()
 
 agent = Agent(
     model=model,
