@@ -4,6 +4,8 @@ from agno.models.openai import OpenAIChat
 from agno.models.openai.like import OpenAILike
 from agno.models.anthropic import Claude
 import os
+import sys
+import signal
 import json
 import httpx
 
@@ -18,6 +20,11 @@ elif os.environ.get("OPENAI_LIKE", "0") != "0":
 		base_url="http://localhost:3001/api/v1/openai")
 else:
   model=LMStudio()
+
+def signal_handler(sig, frame):
+    sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 def cache_to_file(func):
     """Decorator to cache function results to a local file."""
