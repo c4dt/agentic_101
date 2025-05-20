@@ -7,10 +7,8 @@ from common import get_url_cached, model
 
 # Change the personality of the weekly-pick writer to match your interests.
 personality = dedent("""\
-    I am a passionate programmer, software engineer, doing everything from javascript to python, but mainly rust.
-    Everything digital trust is very important to me, mostly with regard to how the governments are the best
-    protection for the people to protect them against the big corporations with regard to
-    privacy, trust, and even security.""")
+    COMPLETE A DESCRIPTION OF YOUR PERSONALITY / INTERESTS FOR THE WEEKLY PICKS.
+    """)
 
 # Global configuration for all agents
 AGENT_CONFIG = {
@@ -96,7 +94,7 @@ write_weekly = Agent(
 
 list_news.session_state={"personality": personality, "news_list": []}
 
-for url in ["www.404media.co"]:
+for url in ["news.ycombinator.com"]:
     list_news.run(url)
 
 order_news.session_state = list_news.session_state
