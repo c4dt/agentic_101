@@ -1,23 +1,7 @@
 from textwrap import dedent
 from agno.agent import Agent, RunResponse
-from agno.models.lmstudio import LMStudio
-from agno.models.openai import OpenAIChat
-from agno.models.openai.like import OpenAILike
-from agno.models.anthropic import Claude
 from markdownify import markdownify as md
-import httpx
-import os
-
-if os.environ.get("ANTHROPIC_API_KEY", "0") != "0":
-  model=Claude(id="claude-3-7-sonnet-latest")
-elif os.environ.get("OPENAI_API_KEY", "0") != "0":
-  model=OpenAIChat(id="gpt-4.1")
-elif os.environ.get("OPENAI_LIKE", "0") != "0":
-  model=OpenAILike(api_key=os.getenv("OPENAI_LIKE"),
-		id="c4dt",
-		base_url="http://localhost:3001/api/v1/openai")
-else:
-  model=LMStudio()
+from common import get_url_cached, model
 
 def get_url(url: str) -> str:
     """This function returns the webpage of the given URL.
@@ -28,10 +12,7 @@ def get_url(url: str) -> str:
 
     Returns:
         str: the webpage as a markdown"""
-    print(f"Fetching URL: {url}")
-    response = httpx.get(url)
-    response.raise_for_status()
-    return md(response.text)
+    return md(get_url_cached(url))
 
 agent = Agent(
     model=model,
@@ -77,14 +58,13 @@ agent = Agent(
         Thank you very much for your collaboration!
     """),
     show_tool_calls=True,
-    markdown=True,
     debug_mode=True
 )
 
 with open("emails.txt", "r") as file:
     emails = file.readlines()
 
-for email in emails[0:1]:
+for email in emails[:3]:
     email = email.strip()
     if email:  # Skip empty lines
         print(email)

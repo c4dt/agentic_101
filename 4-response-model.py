@@ -1,23 +1,7 @@
 from textwrap import dedent
 from agno.agent import Agent, RunResponse
-from agno.models.lmstudio import LMStudio
-from agno.models.openai import OpenAIChat
-from agno.models.openai.like import OpenAILike
-from agno.models.anthropic import Claude
 from pydantic import BaseModel, Field
-import httpx
-import os
-
-if os.environ.get("ANTHROPIC_API_KEY", "0") != "0":
-  model=Claude(id="claude-3-7-sonnet-latest")
-elif os.environ.get("OPENAI_API_KEY", "0") != "0":
-  model=OpenAIChat(id="gpt-4.1")
-elif os.environ.get("OPENAI_LIKE", "0") != "0":
-  model=OpenAILike(api_key=os.getenv("OPENAI_LIKE"),
-		id="c4dt",
-		base_url="http://localhost:3001/api/v1/openai")
-else:
-  model=LMStudio()
+from common import get_url_cached, model
 
 def get_person(email: str) -> str:
     """This function returns the description of this person in the EPFL database.
@@ -28,10 +12,7 @@ def get_person(email: str) -> str:
 
     Returns:
         str: json of the person"""
-    url = f"https://search-api.epfl.ch/api/ldap?q={email}&hl=en"
-    response = httpx.get(url)
-    response.raise_for_status()
-    return response.text
+    return get_url_cached(f"https://search-api.epfl.ch/api/ldap?q={email}&hl=en")
 
 def get_unit(name: str) -> str:
     """This function returns the description of this unit in the EPFL database.
@@ -43,11 +24,7 @@ def get_unit(name: str) -> str:
 
     Returns:
         str: json of the unit, including people"""
-
-    url = f"https://search-api.epfl.ch/api/unit?q={name}&hl=en"
-    response = httpx.get(url)
-    response.raise_for_status()
-    return response.text
+    return get_url_cached(f"https://search-api.epfl.ch/api/unit?q={name}&hl=en")
 
 class RSEDescription(BaseModel):
     organization: str = Field(..., description="Abbreviation of the rganization this unit is in - a school, college, or vice-presidency.")
@@ -103,15 +80,14 @@ agent = Agent(
         return the final answer as JSON, as described.
     """),
     response_model=RSEs,
-    # show_tool_calls=True,
-    # markdown=True,
-    # debug_mode=True
+    show_tool_calls=True,
+    debug_mode=True
 )
 
 with open("emails.txt", "r") as file:
     emails = file.readlines()
 
-for email in emails[:4]: 
+for email in emails[:3]: 
     email = email.strip()
     print(email)
     run: RunResponse = agent.run(email)

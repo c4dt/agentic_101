@@ -1,35 +1,5 @@
-import httpx
-import os
-from functools import lru_cache
-import json
+from common import get_json_cached
 
-def cache_to_file(func):
-    """Decorator to cache function results to a local file."""
-    cache_file = f"{func.__name__}_cache.json"
-    
-    def wrapper(*args):
-        # Load cache from file if it exists
-        if os.path.exists(cache_file):
-            with open(cache_file, "r") as f:
-                cache = json.load(f)
-        else:
-            cache = {}
-        
-        # Check if result is already cached
-        key = str(args)
-        if key in cache:
-            return cache[key]
-        
-        # Call the function and cache the result
-        result = func(*args)
-        cache[key] = result
-        with open(cache_file, "w") as f:
-            json.dump(cache, f)
-        return result
-    
-    return wrapper
-
-@cache_to_file
 def get_person(email: str) -> str:
     """This function returns the description of this person in the EPFL database.
     It returns the full description, without any differentiation.
@@ -40,12 +10,8 @@ def get_person(email: str) -> str:
     Returns:
         str: json of the person"""
         
-    url = f"https://search-api.epfl.ch/api/ldap?q={email}&hl=en"
-    response = httpx.get(url)
-    response.raise_for_status()
-    return response.json()
+    return get_json_cached(f"https://search-api.epfl.ch/api/ldap?q={email}&hl=en")
 
-@cache_to_file
 def get_unit(name: str) -> str:
     """This function returns the description of this unit in the EPFL database.
     It returns the full description, without any differentiation.
@@ -57,10 +23,7 @@ def get_unit(name: str) -> str:
     Returns:
         str: json of the unit, including people"""
 
-    url = f"https://search-api.epfl.ch/api/unit?q={name}&hl=en"
-    response = httpx.get(url)
-    response.raise_for_status()
-    return response.json()
+    return get_json_cached(f"https://search-api.epfl.ch/api/unit?q={name}&hl=en")
 
 with open("emails.txt", "r") as file:
     emails = file.readlines()
@@ -80,7 +43,7 @@ rse_positions = {
 emails_seen = set()
 units_seen = set()
 
-for email in emails[1:]:
+for email in emails[:3]:
     email = email.strip()
     results = get_person(email)
     if len(results) > 1:
