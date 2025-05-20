@@ -94,7 +94,7 @@ write_weekly = Agent(
 
 list_news.session_state={"personality": personality, "news_list": []}
 
-for url in ["news.ycombinator.com"]:
+for url in ["www.404media.co"]:
     list_news.run(url)
 
 order_news.session_state = list_news.session_state

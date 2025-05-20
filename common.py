@@ -11,15 +11,19 @@ import httpx
 
 load_dotenv()
 if os.environ.get("ANTHROPIC_API_KEY", "0") != "0":
-  model=Claude(id="claude-3-7-sonnet-latest")
+    print("Using Anthropic Claude")
+    model=Claude(id="claude-3-7-sonnet-latest")
 elif os.environ.get("OPENAI_API_KEY", "0") != "0":
-  model=OpenAIChat(id="gpt-4.1")
+    print("Using OpenAI GPT-4.1")
+    model=OpenAIChat(id="gpt-4.1")
 elif os.environ.get("OPENAI_LIKE", "0") != "0":
-  model=OpenAILike(api_key=os.getenv("OPENAI_LIKE"),
+    print("Using OpenAI-like for AnythingLLM")
+    model=OpenAILike(api_key=os.getenv("OPENAI_LIKE"),
 		id="c4dt",
 		base_url="http://localhost:3001/api/v1/openai")
 else:
-  model=LMStudio()
+    print("Using LMStudio")
+    model=LMStudio()
 
 def signal_handler(sig, frame):
     sys.exit(0)
